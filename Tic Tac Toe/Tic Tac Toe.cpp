@@ -36,7 +36,18 @@ struct CreateLine
     {
         shape.setOrigin(pos);
     }
+
+    sf::Vector2f getOrigin() const
+    {
+        return shape.getOrigin();
+    }
+
+    sf::Vector2f getSize() const
+    {
+        return shape.getSize();
+    }
 };
+
 struct CreateCircle
 {
     sf::CircleShape shape;
@@ -63,12 +74,11 @@ struct CreateCircle
 };
 
 //functions
-void MakeTurn(int& turn, sf::Vector2f MousePos, float CellSize, int matrix[3][3], sf::RenderWindow& window);
+void MakeTurn(int& turn, int& last_turn, sf::Vector2f MousePos, float CellSize, int matrix[3][3], sf::RenderWindow& window);
 void ClearBoard(int matrix[3][3]); 
 void GameEnd(int martix[3][3], int turn);
 void Make_o(float column, float row, sf::RenderWindow& window);
 void Make_x(float column, float row, sf::RenderWindow& window);
-
 
 unsigned int width = 840; 
 unsigned int height = 640; 
@@ -81,6 +91,7 @@ int main()
     //system variables 
     float cell = 200.0f; 
     int turn = 1;
+    int last_turn = 1;
     float margin = 10.0f;
     int matrix[3][3] = { {0, 0, 0},{0, 0,0}, {0, 0, 0} };
     sf::Vector2f x_LineSize(10.0f, height); 
@@ -131,6 +142,9 @@ int main()
     sf::Sprite Zero(TextZero);
     sf::Sprite Score(TextScore);
 
+    sf::Vector2f pos(cell * 3 + 35.0f + margin, 0.0f + margin);
+    Score.setScale(sf::Vector2f(3.5f, 3.5f));
+    Score.setPosition(pos);
 
     while (window.isOpen())
     {
@@ -146,13 +160,13 @@ int main()
 
             if (const auto* mousePressed = event->getIf<sf::Event::MouseButtonPressed>())
             {
-                MakeTurn(turn, RemPos, cell, matrix, window);
+                MakeTurn(turn, last_turn, RemPos, cell, matrix, window);
             }
 
         }
 
         //checking for game end 
-        GameEnd(matrix, turn);
+        GameEnd(matrix, last_turn);
 
         window.clear();
 
@@ -163,13 +177,11 @@ int main()
             {
                 if (matrix[i][j] == 1)
                 {
-                    Make_o(i* cell + margin * (i+1), j* cell + margin * (1+j), window);
-                    turn = 2;
+                    Make_o(i * cell + margin * (i + 1), j * cell + margin * (1 + j), window);
                 }
                 else if (matrix[i][j] == 2)
                 {
                     Make_x(i * cell + margin * (i + 1), j * cell + margin * (1 + j), window);
-                    turn = 1;
                 }
             }
         }
@@ -184,13 +196,16 @@ int main()
         y_3.draw(window);
         y_4.draw(window);
 
+        // side menu
+        window.draw(Score);
+
         window.display();
 
     }
     return 0; 
 }
 
-void MakeTurn(int& turn, sf::Vector2f MousePos, float CellSize, int matrix[3][3], sf::RenderWindow& window)
+void MakeTurn(int& turn, int& last_turn, sf::Vector2f MousePos, float CellSize, int matrix[3][3], sf::RenderWindow& window)
 {
     int row = (MousePos.y - 10.0f) / CellSize; 
     int column = (MousePos.x - 10.0f) / CellSize;
@@ -201,10 +216,14 @@ void MakeTurn(int& turn, sf::Vector2f MousePos, float CellSize, int matrix[3][3]
             if (turn == 1)
             {
                 matrix[row][column] = 1;
+                last_turn = 1;
+                turn = 2; 
             }
             else if ( turn == 2)
             {
                 matrix[row][column] = 2;
+                last_turn = 2;
+                turn = 1;
             }
         }
     }
@@ -223,21 +242,23 @@ void ClearBoard(int matrix[3][3])
 
 void Make_x(float column, float row, sf::RenderWindow& window)
 {
+    sf::Vector2f cros_size(10.0f, 200.0f);
+    float error = 100.0f;
+    sf::Vector2f pos(row + error, column + error);
+
+    CreateLine l1(cros_size, pos);
+    CreateLine l2(cros_size, pos);
+
+    l1.setOrigin(sf::Vector2f(0, l1.getSize().y / 2.0f));
+    l2.setOrigin(sf::Vector2f(0, l2.getSize().y / 2.0f));
+
     sf::Angle pos_angle = sf::degrees(45);
-    sf::Angle neg_angle = sf::degrees(-45);
-    sf::Vector2f Size(10.0f, 200.0f);
+    sf::Angle neg_angle = sf::degrees(45 + 90);
+    l1.rotate(pos_angle);
+    l2.rotate(neg_angle);
 
-    CreateLine L1(Size, sf::Vector2f(row, column));
-    CreateLine L2(Size, sf::Vector2f(row, column));
-
-    sf::Vector2f midpoint = L1.getGlobalBounds().getCenter();
-    
-    L1.setOrigin(sf::Vector2f(0, midpoint.y / 2.0f));
-    L2.setOrigin(sf::Vector2f(0, midpoint.y / 2.0f));
-    L1.rotate(pos_angle);
-    L2.rotate(neg_angle);
-    L1.draw(window);
-    L2.draw(window);
+    l1.draw(window);
+    l2.draw(window);
 }
 
 void Make_o(float column, float row, sf::RenderWindow& window)
