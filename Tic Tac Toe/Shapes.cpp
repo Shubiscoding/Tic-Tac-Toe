@@ -22,6 +22,10 @@ void CreateLine::draw(sf::RenderWindow& window) const
     window.draw(shape);
 }
 
+void CreateLine::setPosition(sf::Vector2f pos)
+{
+    shape.setPosition(pos);
+}
 void CreateLine::rotate(sf::Angle angle)
 {
     shape.setRotation(angle);

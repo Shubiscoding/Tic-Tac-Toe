@@ -13,6 +13,8 @@ struct CreateLine
 
     void draw(sf::RenderWindow& window) const;
 
+    void setPosition(sf::Vector2f pos);
+
     void rotate(sf::Angle angle);
 
     void setOrigin(sf::Vector2f pos);

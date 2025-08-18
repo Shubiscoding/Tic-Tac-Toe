@@ -16,8 +16,11 @@ void Make_x(float column, float row, sf::RenderWindow& window);
 
 // Game end and Update
 void ClearBoard(int matrix[3][3], int& totalturns);
-bool GameEnd(int martix[3][3], int& totalturns, int turn, int& score_x, int& score_o, bool& NoWin);
+bool GameEnd(int matrix[3][3], int& totalturns, int turn, int& score_x, int& score_o, bool& NoWin);
 void UpdateScore(sf::Text& score, int increment);
 
 // Menu
 bool checkButtonCollision(sf::Sprite& Button, sf::Vector2f Mousepos);
+
+// game over
+void DrawGameOver(sf::RenderWindow& window, int Xscore, int Oscore, sf::Text& winner);

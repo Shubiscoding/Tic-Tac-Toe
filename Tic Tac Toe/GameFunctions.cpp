@@ -71,9 +71,13 @@ bool GameEnd(int matrix[3][3], int& totalturns, int turn, int& score_x, int& sco
     for (int i = 0; i < 3; i++)
     {
         // Horizontal 
-        if ((matrix[i][0] == last_turn && matrix[i][1] == last_turn && matrix[i][2] == last_turn) || (matrix[0][i] == last_turn && matrix[1][i] == last_turn && matrix[2][i] == last_turn))
+        if ((matrix[i][0] == last_turn && matrix[i][1] == last_turn && matrix[i][2] == last_turn))
         {
             return true; 
+        }
+        else if ((matrix[0][i] == last_turn && matrix[1][i] == last_turn && matrix[2][i] == last_turn))
+        {
+            return true;
         }
     }
     if ((matrix[0][0] == last_turn && matrix[1][1] == last_turn && matrix[2][2] == last_turn) || (matrix[0][2] == last_turn && matrix[1][1] == last_turn && matrix[2][0] == last_turn))
@@ -140,4 +144,20 @@ bool checkButtonCollision(sf::Sprite& Button, sf::Vector2f Mousepos)
         Button.setScale(sf::Vector2f(5, 5));
         return false;
     }
+}
+
+void DrawGameOver(sf::RenderWindow& window, int Xscore, int Oscore, sf::Text& winner)
+{
+    window.clear();
+    
+    if (Xscore > Oscore)
+    {
+        winner.setString("The winner is X");
+    }
+    else
+    {
+        winner.setString("The winner is O");
+    }
+
+    window.draw(winner);
 }
